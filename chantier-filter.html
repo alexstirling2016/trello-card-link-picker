@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Tâches du chantier</title>
+<script src="https://p.trellocdn.com/power-up.min.js"></script>
+<style>:root { color-scheme: light dark; } body { margin: 12px; font: 14px system-ui, sans-serif; }</style>
+</head>
+<body>
+<a id="open" target="_blank" rel="noopener noreferrer" hidden>Ouvrir le tableau filtré ↗</a>
+<script>
+const client = window.TrelloPowerUp.iframe();
+client.render(async () => {
+  const [{url}, {name}] = await Promise.all([client.board("url"), client.card("name")]);
+  const board = new URL(url);
+  if (board.origin !== "https://trello.com") return;
+  board.search = "?filter=label:" + encodeURIComponent(name);
+  const link = document.querySelector("#open");
+  link.href = board.href;
+  link.hidden = false;
+});
+</script>
+</body>
+</html>
