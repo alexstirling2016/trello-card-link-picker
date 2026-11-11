@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Ouvrir les tâches du chantier</title>
+</head>
+<body>
+<p><a id="board" href="https://trello.com/b/zquu24NZ/promo-lecture-cdp">Ouvrir le tableau Trello</a></p>
+<script>
+const label = window.location.hash.slice(1);
+if (label) {
+  const link = document.querySelector("#board");
+  const board = new URL(link.href);
+  board.search = "?filter=label:" + encodeURIComponent(decodeURIComponent(label));
+  link.href = board.href;
+  window.location.replace(board.href);
+}
+</script>
+</body>
+</html>
