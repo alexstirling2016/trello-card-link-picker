@@ -36,9 +36,11 @@ window.TrelloPowerUp.initialize({
       ]);
       const label = card?.labels?.find(label => label.name === card.name);
       if (list?.name === "Synthèse" && label && board?.url) {
-        const filtered = new URL(board.url);
-        filtered.search = "?filter=label:" + encodeURIComponent(label.name);
-        buttons.push({text: "Voir les tâches du chantier", url: filtered.href, condition: "signedIn"});
+        buttons.push({
+          text: "Voir les tâches du chantier",
+          condition: "signedIn",
+          callback: client => client.popup({title: "Tâches du chantier", url: "./chantier-filter.html", height: 60}),
+        });
       }
     } catch (error) {
       console.warn("Could not load the chantier filter shortcut", error);
