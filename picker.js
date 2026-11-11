@@ -71,7 +71,7 @@ async function loadCards() {
 authorize.onclick = async () => {
   authorize.disabled = true;
   try {
-    await rest.authorize({scope: "read,write", expiration: "30days"});
+    await rest.authorize({scope: "read,write", expiration: "never"});
     await loadCards();
   } catch (error) {
     message(error.message);
