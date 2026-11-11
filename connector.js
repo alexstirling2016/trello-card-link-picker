@@ -17,7 +17,7 @@ window.TrelloPowerUp.initialize({
       text: "Point d’avancement",
       icon: {light: reportIcon, dark: reportIcon},
       condition: "signedIn",
-      callback: client => client.modal({title: "Point d’avancement", url: "./progress-report.html", height: 420}),
+      callback: client => client.modal({title: "Point d’avancement", url: "./progress-report.html?v=57e6f4e", height: 420}),
     }];
   },
   "card-buttons": () => [{
