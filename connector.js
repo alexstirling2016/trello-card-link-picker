@@ -5,11 +5,11 @@ window.TrelloPowerUp.initialize({
     const {url} = await t.board("url");
     if (!url) return [];
     return [
-      ["Focus uniquement", "Focus · Synthèse"],
-      ["Focus + préalables", "Focus + préalables"],
-    ].map(([text, label]) => {
+      ["Focus uniquement", ["Focus · Synthèse"]],
+      ["Focus + préalables", ["Focus + préalables", "Focus · Synthèse"]],
+    ].map(([text, labels]) => {
       const board = new URL(url);
-      board.search = "?filter=label:" + encodeURIComponent(label);
+      board.search = "?filter=" + labels.map(label => "label:" + encodeURIComponent(label)).join(",");
       return {text, url: board.href, icon: {light: filterIcon, dark: filterIcon}, condition: "signedIn"};
     });
   },
