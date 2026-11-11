@@ -1,4 +1,5 @@
 const filterIcon = new URL("./focus.svg", window.location.href).href;
+const reportIcon = new URL("./lightning.svg", window.location.href).href;
 
 window.TrelloPowerUp.initialize({
   "board-buttons": async t => {
@@ -14,7 +15,7 @@ window.TrelloPowerUp.initialize({
     });
     return [...filters, {
       text: "Point d’avancement",
-      icon: {light: filterIcon, dark: filterIcon},
+      icon: {light: reportIcon, dark: reportIcon},
       condition: "signedIn",
       callback: client => client.modal({title: "Point d’avancement", url: "./progress-report.html", height: 420}),
     }];
