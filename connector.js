@@ -14,16 +14,10 @@ window.TrelloPowerUp.initialize({
       return {text, url: board.href, target: "_self", icon: {light: filterIcon, dark: filterIcon}, condition: "signedIn"};
     });
     return [...filters, {
-      text: "Par quoi commencer ?",
-      icon: {light: reportIcon, dark: reportIcon},
-      condition: "signedIn",
-      url: "https://trello.com/c/Yx7esjaL",
-      target: "_self",
-    }, {
       text: "Point d’avancement",
       icon: {light: reportIcon, dark: reportIcon},
       condition: "signedIn",
-      callback: client => client.modal({title: "Point d’avancement", url: "./progress-report.html?v=e7898e9", height: 480}),
+      callback: client => client.modal({title: "Point d’avancement", url: "./progress-report.html?v=cc7f8b7", height: 480}),
     }];
   },
   "card-buttons": async t => {
