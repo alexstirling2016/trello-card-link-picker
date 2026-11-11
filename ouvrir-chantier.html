@@ -11,7 +11,7 @@ const label = window.location.hash.slice(1);
 if (label) {
   const link = document.querySelector("#board");
   const board = new URL(link.href);
-  board.search = "?filter=label:" + encodeURIComponent(decodeURIComponent(label));
+  board.search = "?filter=label:" + label.split(",").map(value => encodeURIComponent(decodeURIComponent(value))).join(",label:");
   link.href = board.href;
   window.location.replace(board.href);
 }
