@@ -33,6 +33,7 @@ Pour chaque sujet retenu, dis où on en est et quelle action concrète ferait av
   <a href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">Ouvrir ChatGPT Web</a>
 </div>
 <span id="status" role="status"></span>
+<button id="authorize-export" type="button" hidden>Autoriser la lecture du tableau</button>
 <a id="export-fallback" href="https://trello.com/b/zquu24NZ.json" target="_blank" rel="noopener noreferrer" hidden>Ouvrir le JSON Trello et l’enregistrer</a>
 <script>
 const promptField = document.querySelector("#prompt");
@@ -55,12 +56,29 @@ async function copyPrompt() {
 document.querySelector("#copy").addEventListener("click", copyPrompt);
 const download = document.querySelector("#copy-and-download");
 const fallback = document.querySelector("#export-fallback");
+const authorize = document.querySelector("#authorize-export");
+const config = window.pickerConfig;
+const client = window.TrelloPowerUp.iframe(config);
+
+authorize.addEventListener("click", async () => {
+  authorize.disabled = true;
+  try {
+    const rest = await client.getRestApi();
+    await rest.authorize({scope: "read", expiration: "never"});
+    authorize.hidden = true;
+    status.textContent = "Lecture autorisée. Cliquez à nouveau sur Télécharger le JSON.";
+  } catch {
+    status.textContent = "Autorisation Trello non obtenue.";
+  } finally {
+    authorize.disabled = false;
+  }
+});
 
 async function readTrello(path, query, key, token) {
   const url = new URL("https://api.trello.com/1/" + path);
   url.search = new URLSearchParams({...query, key, token});
   const response = await fetch(url, {referrerPolicy: "no-referrer"});
-  if (!response.ok) throw new Error("Export Trello indisponible.");
+  if (!response.ok) throw new Error("Trello a refusé la lecture (HTTP " + response.status + ").");
   return response.json();
 }
 
@@ -71,12 +89,16 @@ download.addEventListener("click", async () => {
     await copyPrompt();
     const copyStatus = status.textContent;
     status.textContent = copyStatus + " Préparation du JSON…";
-    const config = window.pickerConfig;
-    const client = window.TrelloPowerUp.iframe(config);
     const rest = await client.getRestApi();
     const token = await rest.getToken();
-    const boardId = client.getContext().board;
-    if (!token || !boardId) throw new Error("Accès Trello indisponible.");
+    if (!token) {
+      authorize.hidden = false;
+      status.textContent = copyStatus + " Autorisez la lecture du tableau pour télécharger le fichier.";
+      fallback.hidden = false;
+      return;
+    }
+    const {id: boardId} = await client.board("id");
+    if (!boardId) throw new Error("Tableau Trello introuvable.");
     const path = "boards/" + encodeURIComponent(boardId);
     const read = (suffix, query) => readTrello(path + suffix, query, config.appKey, token);
     const [board, checklists, actions] = await Promise.all([
@@ -94,8 +116,9 @@ download.addEventListener("click", async () => {
     link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 30000);
     status.textContent = copyStatus + " Téléchargement lancé.";
-  } catch {
-    status.textContent += " Le téléchargement direct a échoué. Ouvrez le JSON puis utilisez Enregistrer sous.";
+  } catch (error) {
+    const detail = /^(Trello a refusé la lecture \(HTTP \d+\)\.|Tableau Trello introuvable\.)$/.test(error.message) ? error.message : "Le téléchargement direct a échoué.";
+    status.textContent = detail + " Vous pouvez ouvrir le JSON Trello et l’enregistrer.";
     fallback.hidden = false;
   } finally {
     download.disabled = false;
