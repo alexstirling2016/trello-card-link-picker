@@ -1,2 +1,1 @@
-// Set this to the public API key of the UI Power-Up before deploying.
-window.pickerConfig = {appKey: "", appName: "Lier une carte"};
+window.pickerConfig = {"appKey":"282109891edb233069f957442d4c83ab","appName":"Lier une carte"};
