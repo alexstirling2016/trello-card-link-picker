@@ -14,6 +14,11 @@ window.TrelloPowerUp.initialize({
       return {text, url: board.href, icon: {light: filterIcon, dark: filterIcon}, condition: "signedIn"};
     });
     return [...filters, {
+      text: "Par quoi commencer ?",
+      icon: {light: reportIcon, dark: reportIcon},
+      condition: "signedIn",
+      url: "https://trello.com/c/Yx7esjaL",
+    }, {
       text: "Point d’avancement",
       icon: {light: reportIcon, dark: reportIcon},
       condition: "signedIn",
