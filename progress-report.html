@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Point d’avancement</title>
+<script src="https://p.trellocdn.com/power-up.min.js"></script>
+<script src="config.js"></script>
 <style>
 :root { color-scheme: light dark; font: 14px/1.5 system-ui, sans-serif; }
 body { margin: 16px; }
@@ -26,11 +28,12 @@ Pour chaque attente ou blocage significatif, dis ce qui attend, de qui dépend l
 Indique la prochaine étape utile à partir de « Proch. act. » ou d’une action Kanban encore ouverte. Si ces éléments manquent, présente toute prochaine étape comme une proposition. Distingue la date de relance, l’échéance d’une action et le jalon du chantier. Appuie-toi sur les champs renseignés et les notes pertinentes du tableau. Ne déduis ni responsable, ni échéance, ni progrès d’un champ vide. Signale brièvement toute incertitude qui change le point d’avancement. Si le tableau est inaccessible, demande un export récent.</textarea>
 <div class="actions">
   <button id="copy" type="button">Copier le prompt</button>
-  <a id="copy-and-download" href="https://trello.com/b/zquu24NZ.json" target="_blank" rel="noopener noreferrer">Copier le prompt et télécharger le JSON</a>
+  <button id="copy-and-download" type="button">Copier le prompt et télécharger le JSON</button>
   <a href="./open-chatgpt.html" target="_blank" rel="noopener noreferrer">Ouvrir ChatGPT (app)</a>
   <a href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">Ouvrir ChatGPT Web</a>
 </div>
 <span id="status" role="status"></span>
+<a id="export-fallback" href="https://trello.com/b/zquu24NZ.json" target="_blank" rel="noopener noreferrer" hidden>Ouvrir le JSON Trello et l’enregistrer</a>
 <script>
 const promptField = document.querySelector("#prompt");
 const status = document.querySelector("#status");
@@ -50,7 +53,54 @@ async function copyPrompt() {
 }
 
 document.querySelector("#copy").addEventListener("click", copyPrompt);
-document.querySelector("#copy-and-download").addEventListener("click", copyPrompt);
+const download = document.querySelector("#copy-and-download");
+const fallback = document.querySelector("#export-fallback");
+
+async function readTrello(path, query, key, token) {
+  const url = new URL("https://api.trello.com/1/" + path);
+  url.search = new URLSearchParams({...query, key, token});
+  const response = await fetch(url, {referrerPolicy: "no-referrer"});
+  if (!response.ok) throw new Error("Export Trello indisponible.");
+  return response.json();
+}
+
+download.addEventListener("click", async () => {
+  download.disabled = true;
+  fallback.hidden = true;
+  try {
+    await copyPrompt();
+    const copyStatus = status.textContent;
+    status.textContent = copyStatus + " Préparation du JSON…";
+    const config = window.pickerConfig;
+    const client = window.TrelloPowerUp.iframe(config);
+    const rest = await client.getRestApi();
+    const token = await rest.getToken();
+    const boardId = client.getContext().board;
+    if (!token || !boardId) throw new Error("Accès Trello indisponible.");
+    const path = "boards/" + encodeURIComponent(boardId);
+    const read = (suffix, query) => readTrello(path + suffix, query, config.appKey, token);
+    const [board, checklists, actions] = await Promise.all([
+      read("", {cards: "all", card_fields: "all", card_customFieldItems: "true", lists: "all", labels: "all", customFields: "true"}),
+      read("/checklists", {}),
+      read("/actions", {filter: "all", limit: "1000"}),
+    ]);
+    const file = new Blob([JSON.stringify({...board, checklists, actions}, null, 2)], {type: "application/json"});
+    const url = URL.createObjectURL(file);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "promo-lecture-cdp.json";
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+    status.textContent = copyStatus + " Téléchargement lancé.";
+  } catch {
+    status.textContent += " Le téléchargement direct a échoué. Ouvrez le JSON puis utilisez Enregistrer sous.";
+    fallback.hidden = false;
+  } finally {
+    download.disabled = false;
+  }
+});
 </script>
 </body>
 </html>
