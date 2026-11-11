@@ -10,6 +10,7 @@ body { margin: 16px; }
 label { display: block; margin-bottom: 8px; }
 textarea { display: block; box-sizing: border-box; width: 100%; min-height: 250px; padding: 10px; font: inherit; resize: vertical; }
 button { margin-top: 12px; padding: 6px 12px; font: inherit; cursor: pointer; }
+.open-chat { margin-inline-start: 12px; }
 #status { margin-inline-start: 8px; }
 </style>
 </head>
@@ -23,6 +24,7 @@ Pour chaque attente ou blocage significatif, dis ce qui attend, de qui dépend l
 
 Indique la prochaine étape utile à partir de « Proch. act. » ou d’une action Kanban encore ouverte. Si ces éléments manquent, présente toute prochaine étape comme une proposition. Distingue la date de relance, l’échéance d’une action et le jalon du chantier. Appuie-toi sur les champs renseignés et les notes pertinentes du tableau. Ne déduis ni responsable, ni échéance, ni progrès d’un champ vide. Signale brièvement toute incertitude qui change le point d’avancement. Si le tableau est inaccessible, demande un export récent.</textarea>
 <button id="copy" type="button">Copier le prompt</button>
+<a class="open-chat" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">Ouvrir ChatGPT</a>
 <span id="status" role="status"></span>
 <script>
 const promptField = document.querySelector("#prompt");
