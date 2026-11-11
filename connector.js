@@ -4,7 +4,7 @@ window.TrelloPowerUp.initialize({
   "board-buttons": async t => {
     const {url} = await t.board("url");
     if (!url) return [];
-    return [
+    const filters = [
       ["Focus uniquement", ["Focus · Synthèse"]],
       ["Focus + préalables", ["Focus + préalables", "Focus · Synthèse"]],
     ].map(([text, labels]) => {
@@ -12,6 +12,12 @@ window.TrelloPowerUp.initialize({
       board.search = "?filter=" + labels.map(label => "label:" + encodeURIComponent(label)).join(",");
       return {text, url: board.href, icon: {light: filterIcon, dark: filterIcon}, condition: "signedIn"};
     });
+    return [...filters, {
+      text: "Point d’avancement",
+      icon: {light: filterIcon, dark: filterIcon},
+      condition: "signedIn",
+      callback: client => client.modal({title: "Point d’avancement", url: "./progress-report.html", height: 420}),
+    }];
   },
   "card-buttons": () => [{
     text: "Lier une carte",
