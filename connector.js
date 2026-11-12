@@ -15,7 +15,7 @@ window.TrelloPowerUp.initialize({
     const focused = [...new Set([focus, ...chantierLabels])];
     const filters = [
       ["Focus uniquement", focused],
-      ["Focus + préalables urgents", [...focused, prerequisite]],
+      ["Focus + préalables", [...focused, prerequisite]],
     ].map(([text, labels]) => {
       const board = new URL(url);
       board.search = "?filter=" + labels.map(label => "label:" + encodeURIComponent(label)).join(",");
@@ -31,7 +31,7 @@ window.TrelloPowerUp.initialize({
   "card-buttons": async t => {
     const buttons = [{
       text: "Lier une carte",
-      callback: client => client.popup({title: "Lier une carte", url: "./picker.html", height: 385}),
+      callback: client => client.popup({title: "Lier une carte", url: "./picker.html?v=relations2", height: 385}),
     }];
     try {
       const [list, card, board] = await Promise.all([
