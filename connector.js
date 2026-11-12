@@ -3,11 +3,14 @@ const reportIcon = new URL("./lightning.svg", window.location.href).href;
 
 window.TrelloPowerUp.initialize({
   "board-buttons": async t => {
-    const {url} = await t.board("url");
+    const {url, labels} = await t.board("url", "labels");
     if (!url) return [];
+    const names = new Set((labels ?? []).map(label => label.name));
+    const focus = names.has("Focus") ? "Focus" : "Focus · Synthèse";
+    const prerequisite = names.has("Préalable") ? "Préalable" : "Focus + préalables";
     const filters = [
-      ["Focus uniquement", ["Focus · Synthèse"]],
-      ["Focus + préalables", ["Focus + préalables", "Focus · Synthèse"]],
+      ["Focus uniquement", [focus]],
+      ["Focus + préalables", [prerequisite, focus]],
     ].map(([text, labels]) => {
       const board = new URL(url);
       board.search = "?filter=" + labels.map(label => "label:" + encodeURIComponent(label)).join(",");
