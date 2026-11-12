@@ -14,7 +14,7 @@ window.TrelloPowerUp.initialize({
       && card.labels.some(label => label.name === card.name)).map(card => card.name);
     const focused = [...new Set([focus, ...chantierLabels])];
     const filters = [
-      ["Focus uniquement", focused],
+      ["Chantiers en Focus", [focus]],
       ["Focus + préalables", [...focused, prerequisite]],
     ].map(([text, labels]) => {
       const board = new URL(url);
