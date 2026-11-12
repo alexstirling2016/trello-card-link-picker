@@ -1,4 +1,4 @@
-import {createRelationship, filterCards} from "./relationships.mjs";
+import {createRelationship, filterCards} from "./relationships.mjs?v=79296ac";
 
 const config = window.pickerConfig;
 const t = window.TrelloPowerUp.iframe(config);
