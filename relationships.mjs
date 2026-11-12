@@ -43,11 +43,12 @@ export async function createRelationship(api, boardId, sourceId, targetId, kind)
   if ([source, target].some(card => card.labels.some(label => markerNames.has(label.name)))) {
     throw new Error("Retirez l’étiquette temporaire d’automatisation avant de créer le lien.");
   }
-  if (kind === "feeds") {
-    await ensureAttachment(api, source, target);
-    await ensureAttachment(api, target, source);
-    await ensureItem(api, source, "Ce chantier alimente", target, namedLink(target));
-    await ensureItem(api, target, "Ce chantier est alimenté par", source, namedLink(source));
+  if (kind === "feeds" || kind === "fed-by") {
+    const [contributor, recipient] = kind === "feeds" ? [source, target] : [target, source];
+    await ensureAttachment(api, contributor, recipient);
+    await ensureAttachment(api, recipient, contributor);
+    await ensureItem(api, contributor, "Ce chantier alimente", recipient, namedLink(recipient));
+    await ensureItem(api, recipient, "Ce chantier est alimenté par", contributor, namedLink(contributor));
     return;
   }
   if (kind !== "precedes" && kind !== "prerequisite") throw new Error("Type de lien inconnu.");
